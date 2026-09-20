@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand-50:  #EEF8F1;
+  --color-brand-100: #DCF0E3;
+  --color-brand-200: #BBE1C9;
+  --color-brand-300: #8CCBA5;
+  --color-brand-400: #52AE7A;
+  --color-brand-500: #2A9159;
+  --color-brand-600: #1E8049;
+  --color-brand-700: #176B3D;
+  --color-brand-800: #135732;
+  --color-brand-900: #0F4527;
+  --color-brand-950: #0A2A1B;
+
+  --color-ink:     #0F1F17;
+  --color-surface: #F6F9F7;
+
+  --radius-card:    1rem;
+  --radius-control: 0.75rem;
+
+  --shadow-card:       0 1px 2px rgba(15,31,23,.04), 0 8px 24px rgba(15,31,23,.06);
+  --shadow-card-hover: 0 2px 4px rgba(15,31,23,.06), 0 12px 32px rgba(15,31,23,.10);
+}
+
+body {
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+/* Leaflet fix for Next.js */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* Smooth transitions */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Focus rings */
+:focus-visible {
+  outline: 2px solid #2A9159;
+  outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Skeleton shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Count-up animation for merge banner */
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(23, 107, 61, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(23, 107, 61, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(23, 107, 61, 0); }
+}
+.pulse-ring {
+  animation: pulse-ring 0.6s ease-out;
+}
+
+/* Scale-in check */
+@keyframes scale-in {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.scale-in-once {
+  animation: scale-in 0.4s ease-out forwards;
+}
+
+/* Priority bar chart */
+.bar-fill {
+  transition: height 0.6s ease-out;
+}

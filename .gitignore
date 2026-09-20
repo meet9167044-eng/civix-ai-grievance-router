@@ -1,0 +1,31 @@
+# Civix .gitignore
+
+# Environment secrets — NEVER commit
+.env.local
+.env*.local
+
+# Next.js
+civix/.next/
+civix/out/
+civix/dist/
+civix/build/
+civix/.vercel/
+
+# Node modules
+civix/node_modules/
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# TypeScript build info
+*.tsbuildinfo
