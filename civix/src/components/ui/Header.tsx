@@ -61,6 +61,7 @@ function LoginModal({ onClose }: { onClose: () => void }) {
 }
 
 export function Header() {
+  const router = useRouter();
   const [role, setRole] = useState<Role>(() => {
     if (typeof window === "undefined") return null;
     return localStorage.getItem("civix_role") as Role;
@@ -83,10 +84,19 @@ export function Header() {
       localStorage.setItem("civix_role", newRole);
       setRole(newRole);
       window.dispatchEvent(new Event("civix_role_change"));
+      if (newRole === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/");
+      }
     }
     setShowDropdown(false);
   }
 
+  function goToAdmin() {
+    setShowDropdown(false);
+    router.push("/admin");
+  }
 
   return (
     <>
@@ -106,6 +116,12 @@ export function Header() {
             <Link href="/#about" className="text-sm text-gray-700 hover:text-brand-700 transition-colors">
               About
             </Link>
+            {role === "admin" && (
+              <Link href="/admin" className="text-sm font-semibold text-brand-700 hover:text-brand-800 transition-colors flex items-center gap-1.5 bg-brand-50 px-3 py-1 rounded-full border border-brand-200">
+                <span className="w-2 h-2 rounded-full bg-brand-600 animate-pulse" />
+                Admin Dashboard
+              </Link>
+            )}
           </nav>
 
           {/* Right side */}
@@ -119,23 +135,47 @@ export function Header() {
                   <div className="w-7 h-7 rounded-full bg-brand-100 text-brand-800 text-xs font-bold flex items-center justify-center">
                     {role === "admin" ? "A" : "C"}
                   </div>
-                  <span className="hidden sm:inline capitalize">{role}</span>
+                  <span className="hidden sm:inline capitalize font-semibold">{role}</span>
                   <ChevronDown size={14} className="text-gray-400" />
                 </button>
                 {showDropdown && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-[var(--radius-card)] shadow-lg border border-gray-100 overflow-hidden">
-                    <button
-                      onClick={() => switchRole("citizen")}
-                      className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-brand-50 hover:text-brand-700 transition-colors"
-                    >
-                      Switch to Citizen
-                    </button>
-                    <button
-                      onClick={() => switchRole("admin")}
-                      className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-brand-50 hover:text-brand-700 transition-colors"
-                    >
-                      Switch to Admin
-                    </button>
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-[var(--radius-card)] shadow-xl border border-gray-100 overflow-hidden py-1 z-50 animate-in fade-in zoom-in-95">
+                    {role === "admin" ? (
+                      <>
+                        <button
+                          onClick={goToAdmin}
+                          className="w-full text-left px-4 py-2.5 text-sm font-semibold text-brand-800 bg-brand-50/70 hover:bg-brand-100 transition-colors flex items-center justify-between"
+                        >
+                          <span>Open Admin Dashboard</span>
+                          <span className="text-xs bg-brand-600 text-white px-2 py-0.5 rounded font-mono">/admin</span>
+                        </button>
+                        <div className="h-px bg-gray-100 my-1" />
+                        <button
+                          onClick={() => switchRole("citizen")}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                        >
+                          Switch to Citizen
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => switchRole("admin")}
+                          className="w-full text-left px-4 py-2.5 text-sm font-semibold text-brand-700 hover:bg-brand-50 transition-colors flex items-center justify-between"
+                        >
+                          <span>Switch to Admin</span>
+                          <span className="text-xs bg-brand-100 text-brand-800 px-1.5 py-0.5 rounded font-mono">Console</span>
+                        </button>
+                        <div className="h-px bg-gray-100 my-1" />
+                        <Link
+                          href="/report"
+                          onClick={() => setShowDropdown(false)}
+                          className="w-full block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                        >
+                          Report an Issue
+                        </Link>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
@@ -172,6 +212,15 @@ export function Header() {
             <Link href="/#about" className="text-sm text-gray-700 hover:text-brand-700 py-2" onClick={() => setMobileOpen(false)}>
               About
             </Link>
+            {role === "admin" && (
+              <Link
+                href="/admin"
+                className="h-11 flex items-center justify-center gap-2 rounded-[var(--radius-control)] border border-brand-600 bg-brand-50 text-brand-800 text-sm font-semibold hover:bg-brand-100"
+                onClick={() => setMobileOpen(false)}
+              >
+                Admin Dashboard (/admin)
+              </Link>
+            )}
             <Link
               href="/report"
               className="h-11 flex items-center justify-center rounded-[var(--radius-control)] bg-brand-700 text-white text-sm font-semibold hover:bg-brand-800"

@@ -1,7 +1,7 @@
 // app/page.tsx — Civix landing page
 
 import Link from "next/link";
-import { Zap, Target, Landmark, BarChart3, Play, ArrowRight, Leaf } from "lucide-react";
+import { Zap, Target, Landmark, BarChart3, Play, ArrowRight, Leaf, LayoutDashboard } from "lucide-react";
 
 const features = [
   {
@@ -71,16 +71,23 @@ export default function LandingPage() {
             <div className="flex flex-wrap gap-4">
               <Link
                 href="/report"
-                className="inline-flex items-center gap-2 h-12 px-6 rounded-[var(--radius-control)] bg-brand-700 text-white font-semibold hover:bg-brand-800 active:scale-[.98] transition-all"
+                className="inline-flex items-center gap-2 h-12 px-6 rounded-[var(--radius-control)] bg-brand-700 text-white font-semibold hover:bg-brand-800 active:scale-[.98] transition-all shadow-sm"
               >
                 Report an Issue
                 <ArrowRight size={18} />
               </Link>
+              <Link
+                href="/admin"
+                className="inline-flex items-center gap-2 h-12 px-6 rounded-[var(--radius-control)] border border-brand-600 text-brand-700 font-semibold bg-white hover:bg-brand-50 active:scale-[.98] transition-all"
+              >
+                <LayoutDashboard size={18} />
+                Admin Console
+              </Link>
               <a
                 href="#how-it-works"
-                className="inline-flex items-center gap-2 h-12 px-6 rounded-[var(--radius-control)] border border-gray-200 text-gray-700 font-semibold bg-white hover:bg-gray-50 active:scale-[.98] transition-all"
+                className="inline-flex items-center gap-2 h-12 px-5 rounded-[var(--radius-control)] text-gray-600 font-medium hover:text-gray-900 transition-all"
               >
-                <Play size={16} className="fill-gray-600 text-gray-600" />
+                <Play size={16} className="fill-gray-500 text-gray-500" />
                 See How It Works
               </a>
             </div>
@@ -89,12 +96,13 @@ export default function LandingPage() {
           {/* Right — hero image placeholder */}
           <div className="relative hidden lg:block">
             <div className="absolute -left-6 top-4 w-[calc(100%+24px)] h-[90%] bg-brand-50 rounded-[24px] -z-10" />
-            <div className="relative w-full aspect-[5/4] rounded-[24px] overflow-hidden bg-brand-100 flex items-center justify-center">
-              <div className="text-center">
-                <Leaf size={64} className="text-brand-400 fill-brand-300 mx-auto mb-4" />
-                <p className="text-brand-600 font-semibold text-lg">hero-city.jpg</p>
-                <p className="text-brand-400 text-sm">Add to public/hero-city.jpg</p>
-              </div>
+            <div className="relative w-full aspect-[5/4] rounded-[24px] overflow-hidden shadow-2xl border border-brand-100/50">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/hero-city.jpg"
+                alt="Civix clean smart city infrastructure"
+                className="w-full h-full object-cover"
+              />
             </div>
             {/* Floating quote card */}
             <div className="absolute -left-8 bottom-12 bg-white rounded-2xl shadow-lg p-5 max-w-[200px] border border-gray-100">
