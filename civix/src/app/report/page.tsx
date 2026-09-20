@@ -76,7 +76,6 @@ function Stepper({ step }: { step: Step }) {
 
 // ── Step 1 component ─────────────────────────────────────────────────────────
 interface Step1Props {
-  photo: File | null;
   description: string;
   errors: FormErrors;
   apiError: string | null;
@@ -88,7 +87,6 @@ interface Step1Props {
 }
 
 function Step1({
-  photo,
   description,
   errors,
   apiError,
@@ -165,8 +163,7 @@ function Step1({
       <div className="sticky bottom-0 sm:static bg-surface sm:bg-transparent pt-4 pb-4">
         <button
           onClick={goToReview}
-          disabled={!photo || description.trim().length < 10}
-          className="w-full h-12 rounded-[var(--radius-control)] bg-brand-700 text-white font-semibold flex items-center justify-center gap-2 hover:bg-brand-800 active:scale-[.98] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+          className="w-full h-12 rounded-[var(--radius-control)] bg-brand-700 text-white font-semibold flex items-center justify-center gap-2 hover:bg-brand-800 active:scale-[.98] shadow-sm hover:shadow transition-all"
         >
           Next
           <ArrowRight size={18} />
@@ -308,9 +305,9 @@ export default function ReportPage() {
 
   function validateStep1(): boolean {
     const errs: FormErrors = {};
-    if (!photo) errs.photo = "Add a photo so we can see the issue.";
-    if (description.trim().length < 10)
-      errs.description = "Please add at least 10 characters describing the issue.";
+    if (!photo) errs.photo = "Please add a photo so we can see the issue.";
+    if (!description.trim())
+      errs.description = "Please describe what you see.";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }
@@ -398,7 +395,6 @@ export default function ReportPage() {
 
         {step === 1 && (
           <Step1
-            photo={photo}
             description={description}
             errors={errors}
             apiError={apiError}

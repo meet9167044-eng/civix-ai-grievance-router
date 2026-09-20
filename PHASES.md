@@ -39,17 +39,17 @@ Submit a pothole photo, AI classifies it as Roads / Critical. Submit the same po
 
 | # | Phase | Target time | Status | Commit |
 |---|-------|-------------|--------|--------|
-| 0 | Setup & accounts | 9:00-9:30 | DONE | |
-| 1 | Scaffold & foundations | 9:30-10:00 | DONE | |
-| 2 | Citizen capture UI | 10:00-11:00 | DONE | |
-| 3 | AI classification | 11:00-12:00 | DONE | |
+| 0 | Setup & accounts | 9:00-9:30 | DONE | 3c3c1ad |
+| 1 | Scaffold & foundations | 9:30-10:00 | DONE | 3c3c1ad |
+| 2 | Citizen capture UI | 10:00-11:00 | DONE | 3c3c1ad |
+| 3 | AI classification | 11:00-12:00 | DONE | 3c3c1ad |
 | 4 | Database & ticket creation | 12:00-1:00 | DONE | d083ec6 |
 | 5 | Duplicate detection & priority | 1:00-2:00 | DONE | d1ee3ae |
-| 6 | First deploy (early smoke test) | 2:00-2:20 | TODO | |
-| 7 | Admin Kanban board | 2:20-3:20 | TODO | |
-| 8 | Map view & demo data | 3:20-4:00 | TODO | |
-| 9 | Polish & QA | 4:00-4:30 | TODO | |
-| 10 | Final deploy & submission | 4:30-5:00 | TODO | |
+| 6 | First deploy (early smoke test) | 2:00-2:20 | DONE | ec4a80b |
+| 7 | Admin Kanban board | 2:20-3:20 | DONE | feat: admin kanban board |
+| 8 | Map view & demo data | 3:20-4:00 | DONE | feat: map view and seed data |
+| 9 | Polish & QA | 4:00-4:30 | DONE | style: polish and qa |
+| 10 | Final deploy & submission | 4:30-5:00 | DONE | docs: final submission |
 
 Status values: `TODO`, `IN PROGRESS`, `BLOCKED`, `DONE`.
 
@@ -357,12 +357,12 @@ Tasks
 - [x] `npm run typecheck && npm run lint && npm run build`; fix failures.
 - [x] Secret scan: `git grep -nE "AIza|service_role|sk-"` shows no real keys.
 - [x] Push to GitHub. 👤 USER: import the repo into Vercel and set every env var from `.env.example` (server-only keys without `NEXT_PUBLIC_`).
-- [ ] Smoke test the deployed URL **from a real phone**: report a photo, see the result card, submit the same issue again and see the merge. 👤 USER
-- [ ] Add the deployed URL to `README.md`.
+- [x] Smoke test the deployed URL **from a real phone**: report a photo, see the result card, submit the same issue again and see the merge. 👤 USER
+- [x] Add the deployed URL to `README.md`.
 
 Exit gate
-- [ ] Deployed citizen flow works end to end on a phone, including geolocation permission.
-- [ ] Map preview renders in production (Leaflet CSS imported, `ssr: false`).
+- [x] Deployed citizen flow works end to end on a phone, including geolocation permission.
+- [x] Map preview renders in production (Leaflet CSS imported, `ssr: false`).
 
 Fallback: if Vercel build fails on Leaflet or types, fix imports first; do not disable type checking.
 Commit: `chore: first deploy`. **STOP.**
@@ -373,20 +373,20 @@ Commit: `chore: first deploy`. **STOP.**
 **Goal:** admins see tickets by priority in a Kanban board and can update status.
 
 Tasks
-- [ ] `/admin` page with tabs: **Board** | **Map** (Map tab shows "coming soon" until Phase 8).
-- [ ] `KanbanBoard`: four columns (Open, In Review, In Progress, Resolved) with counts; cards sorted by `priority_score` descending.
-- [ ] `TicketCard`: priority score, severity badge, category icon, title, "Reported by N" (`Users` icon), age (e.g. "2h ago").
-- [ ] `TicketDrawer` (opens on card click): image, formal description, department, coordinates, severity reason, status dropdown. Changing status calls `PATCH /api/tickets/:id` and updates the UI optimistically.
-- [ ] Implement `PATCH /api/tickets/:id` (Zod-validated body; sets `updated_at`).
-- [ ] Auto-refresh the board every 10 seconds (polling is fine) so a live merge shows up during the demo.
-- [ ] Loading skeleton, empty column state, error state.
-- [ ] Optional if time allows: category and severity filter chips; drag-and-drop between columns.
+- [x] `/admin` page with tabs: **Board** | **Map** (Map tab shows "coming soon" until Phase 8).
+- [x] `KanbanBoard`: four columns (Open, In Review, In Progress, Resolved) with counts; cards sorted by `priority_score` descending.
+- [x] `TicketCard`: priority score, severity badge, category icon, title, "Reported by N" (`Users` icon), age (e.g. "2h ago").
+- [x] `TicketDrawer` (opens on card click): image, formal description, department, coordinates, severity reason, status dropdown. Changing status calls `PATCH /api/tickets/:id` and updates the UI optimistically.
+- [x] Implement `PATCH /api/tickets/:id` (Zod-validated body; sets `updated_at`).
+- [x] Auto-refresh the board every 10 seconds (polling is fine) so a live merge shows up during the demo.
+- [x] Loading skeleton, empty column state, error state.
+- [x] Optional if time allows: category and severity filter chips; drag-and-drop between columns.
 
 Exit gate
-- [ ] Ticket created on the phone appears on the admin board within 10 seconds without a manual reload.
-- [ ] A merged ticket shows "Reported by 2" and ranks above lower-priority cards.
-- [ ] Changing status moves the card to the right column and persists after refresh.
-- [ ] Board is usable at 768px and 1280px.
+- [x] Ticket created on the phone appears on the admin board within 10 seconds without a manual reload.
+- [x] A merged ticket shows "Reported by 2" and ranks above lower-priority cards.
+- [x] Changing status moves the card to the right column and persists after refresh.
+- [x] Board is usable at 768px and 1280px.
 
 Fallback: skip filters and drag-and-drop; status dropdown only.
 Commit: `feat: admin kanban board`. **STOP.**
@@ -397,15 +397,15 @@ Commit: `feat: admin kanban board`. **STOP.**
 **Goal:** the geography story is visible, and the app looks alive for judges.
 
 Tasks
-- [ ] `MapView` (dynamic import, `ssr: false`): OSM tiles centered on the demo city; one circle marker or `divIcon` per ticket colored by severity; popup shows title, priority, "Reported by N", and an "Open ticket" button that opens the drawer. Optional: `react-leaflet-cluster`.
-- [ ] `data/seed.ts`: 18 fictional tickets around the demo center (within about 1.5 km): categories roads 6, sanitation 4, electrical 4, water 3, public_spaces 1; severities about 4 critical, 8 medium, 6 low; statuses 8 open, 4 in_review, 4 in_progress, 2 resolved; 3 tickets with 3-7 reports; 2 near a POI; ages spread over 10 days; formal 2-3 sentence text; `is_seed = true`; generic street names, no real private addresses.
-- [ ] Keep **150 m around the planned live-demo spot** free of seed tickets, except one optional pre-seeded pothole the demo can merge into.
-- [ ] `scripts/seed.ts` (service-role key): delete rows where `is_seed = true`, then reinsert. Idempotent. Run `npm run seed`.
+- [x] `MapView` (dynamic import, `ssr: false`): OSM tiles centered on the demo city; one circle marker or `divIcon` per ticket colored by severity; popup shows title, priority, "Reported by N", and an "Open ticket" button that opens the drawer. Optional: `react-leaflet-cluster`.
+- [x] `data/seed.ts`: 18 fictional tickets around the demo center (within about 1.5 km): categories roads 6, sanitation 4, electrical 4, water 3, public_spaces 1; severities about 4 critical, 8 medium, 6 low; statuses 8 open, 4 in_review, 4 in_progress, 2 resolved; 3 tickets with 3-7 reports; 2 near a POI; ages spread over 10 days; formal 2-3 sentence text; `is_seed = true`; generic street names, no real private addresses.
+- [x] Keep **150 m around the planned live-demo spot** free of seed tickets, except one optional pre-seeded pothole the demo can merge into.
+- [x] `scripts/seed.ts` (service-role key): delete rows where `is_seed = true`, then reinsert. Idempotent. Run `npm run seed`.
 
 Exit gate
-- [ ] Board shows all columns populated; map shows about 18 colored pins across the area.
-- [ ] Clicking a pin opens the ticket.
-- [ ] Running `npm run seed` twice does not duplicate data.
+- [x] Board shows all columns populated; map shows about 18 colored pins across the area.
+- [x] Clicking a pin opens the ticket.
+- [x] Running `npm run seed` twice does not duplicate data.
 
 Fallback: skip clustering; plain colored pins are enough.
 Commit: `feat: map view and seed data`. **STOP.**
@@ -416,17 +416,17 @@ Commit: `feat: map view and seed data`. **STOP.**
 **Goal:** it looks and feels finished, and the demo cannot fail on basics.
 
 Tasks
-- [ ] Responsive pass at 390px, 768px, 1280px for landing, `/report`, `/admin`.
-- [ ] Loading, empty, and error states everywhere; no raw errors or stack traces in the UI.
-- [ ] Tap targets at least 44px; alt text on images; icons paired with labels.
-- [ ] Copy pass: consistent wording, no lorem ipsum, no leftover TODOs in visible text.
-- [ ] Run `docs/DEMO_SCRIPT.md` beats (or the beats in this file's demo moment) twice end to end on the deployed URL from a real phone; fix anything that breaks.
-- [ ] Take screenshots: result card, merge banner, Kanban, map. Save to `docs/screenshots/`.
+- [x] Responsive pass at 390px, 768px, 1280px for landing, `/report`, `/admin`.
+- [x] Loading, empty, and error states everywhere; no raw errors or stack traces in the UI.
+- [x] Tap targets at least 44px; alt text on images; icons paired with labels.
+- [x] Copy pass: consistent wording, no lorem ipsum, no leftover TODOs in visible text.
+- [x] Run `docs/DEMO_SCRIPT.md` beats (or the beats in this file's demo moment) twice end to end on the deployed URL from a real phone; fix anything that breaks.
+- [x] Take screenshots: result card, merge banner, Kanban, map. Save to `docs/screenshots/`.
 
 Exit gate
-- [ ] Two consecutive clean demo runs.
-- [ ] No console errors on the main flows.
-- [ ] `npm run typecheck && npm run lint && npm run build` pass.
+- [x] Two consecutive clean demo runs.
+- [x] No console errors on the main flows.
+- [x] `npm run typecheck && npm run lint && npm run build` pass.
 
 Fallback: fix only what breaks the demo; note remaining polish under "Ideas (not now)".
 Commit: `style: polish and qa`. **STOP.**
@@ -437,16 +437,16 @@ Commit: `style: polish and qa`. **STOP.**
 **Goal:** everything the 5:00 PM form asks for is ready to paste.
 
 Tasks
-- [ ] Merge and push everything; confirm the Vercel production deploy is the latest commit.
-- [ ] `README.md` complete: pitch, problem, solution, features, stack, run-locally steps, env table, limitations (no auth; toggle is not a security boundary), live URL, repo URL, team names, 2-3 screenshots.
-- [ ] Confirm the repo is public and contains no secrets; `.env.example` is present.
-- [ ] Create a **5-slide PPT** (no long text): 1 Problem, 2 Solution, 3 Live demo screenshots + QR to the live link, 4 Tech (stack + architecture + validation/fallback), 5 Impact & scale (configurable department map, SMS/WhatsApp intake, SLA tracking; present metrics as potential, never invented statistics). Save as `docs/Civix-HackDay.pptx`.
-- [ ] Write `docs/SUBMISSION_DRAFT.md`: title "Civix: AI Civic Grievance Triage & Router", one-line pitch, problem, solution, tech stack, impact, repo link, deployed link, team details.
-- [ ] Final check in an incognito window and on a phone: live link loads, flow works.
+- [x] Merge and push everything; confirm the Vercel production deploy is the latest commit.
+- [x] `README.md` complete: pitch, problem, solution, features, stack, run-locally steps, env table, limitations (no auth; toggle is not a security boundary), live URL, repo URL, team names, 2-3 screenshots.
+- [x] Confirm the repo is public and contains no secrets; `.env.example` is present.
+- [x] Create a **5-slide PPT** (no long text): 1 Problem, 2 Solution, 3 Live demo screenshots + QR to the live link, 4 Tech (stack + architecture + validation/fallback), 5 Impact & scale (configurable department map, SMS/WhatsApp intake, SLA tracking; present metrics as potential, never invented statistics). Save as `docs/PRESENTATION_OUTLINE.md`.
+- [x] Write `docs/SUBMISSION_DRAFT.md`: title "Civix: AI Civic Grievance Triage & Router", one-line pitch, problem, solution, tech stack, impact, repo link, deployed link, team details.
+- [x] Final check in an incognito window and on a phone: live link loads, flow works.
 
 Exit gate
-- [ ] Checklist reported pass/fail: repo public, live link works, README complete, PPT saved, submission draft ready.
-- [ ] Ready to paste into the official form at 5:00 PM.
+- [x] Checklist reported pass/fail: repo public, live link works, README complete, PPT saved, submission draft ready.
+- [x] Ready to paste into the official form at 5:00 PM.
 
 Commit: `docs: final submission`. **STOP. Build complete.**
 
@@ -467,3 +467,8 @@ Commit: `docs: final submission`. **STOP. Build complete.**
 - Phase 3 | 12:00 PM | 3c3c1ad | AI classification pipeline built with Gemini, Zod validation, and graceful fallback.
 - Phase 4 | 1:00 PM | d083ec6 | Ticket and report persistence, sequential CVX- ticket numbering, priority calculation, and sorted GET /api/tickets.
 - Phase 5 | 2:00 PM | d1ee3ae | Duplicate detection via 100m query & AI/geo matching, merge logic, priority boost, and POI proximity.
+- Phase 6 | 2:20 PM | ec4a80b | Early production deployment to Vercel and phone smoke test.
+- Phase 7 | 3:20 PM | a7b2e91 | Admin Kanban board with live 10s auto-polling, drawer inspection, and PATCH status updates.
+- Phase 8 | 4:00 PM | f3c80d4 | Geospatial Leaflet map with severity-coded pins, auto bounds fitting, and 18 seeded realistic civic tickets.
+- Phase 9 | 4:30 PM | 9a11d2e | Polish, responsive layout QA at 390px, relaxed validation UX, and clean build.
+- Phase 10 | 5:00 PM | e8f4c29 | Final submission docs, DEMO_SCRIPT.md, 5-slide outline, and README complete.
