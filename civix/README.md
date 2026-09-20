@@ -14,15 +14,15 @@ Municipal complaint portals are flooded with duplicate and miscategorized report
 5. **Admin console:** Kanban board and clustered map, sorted by priority.
 
 ## Live demo
-- App: `<DEPLOYED_URL>`
-- Repo: `<GITHUB_URL>`
+- App: `<DEPLOYED_URL>` (Deploy to Vercel in Phase 6)
+- Repo: `https://github.com/meet9167044-eng/civix-ai-grievance-router`
 
 ## Tech stack
 Next.js, TypeScript, Tailwind CSS, Lucide, Supabase, Leaflet + OpenStreetMap, Gemini API, Web Speech API, Vercel.
 
 ## Run locally
 ```bash
-git clone <GITHUB_URL> && cd civix
+git clone https://github.com/meet9167044-eng/civix-ai-grievance-router.git && cd civix-ai-grievance-router/civix
 npm install
 cp .env.example .env.local   # fill in keys
 npm run dev

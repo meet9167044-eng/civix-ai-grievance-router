@@ -354,10 +354,10 @@ Commit: `feat: duplicate detection and priority score`. **STOP.**
 **Goal:** find deployment problems now, not at 4:45 PM.
 
 Tasks
-- [ ] `npm run typecheck && npm run lint && npm run build`; fix failures.
-- [ ] Secret scan: `git grep -nE "AIza|service_role|sk-"` shows no real keys.
-- [ ] Push to GitHub. 👤 USER: import the repo into Vercel and set every env var from `.env.example` (server-only keys without `NEXT_PUBLIC_`).
-- [ ] Smoke test the deployed URL **from a real phone**: report a photo, see the result card, submit the same issue again and see the merge.
+- [x] `npm run typecheck && npm run lint && npm run build`; fix failures.
+- [x] Secret scan: `git grep -nE "AIza|service_role|sk-"` shows no real keys.
+- [x] Push to GitHub. 👤 USER: import the repo into Vercel and set every env var from `.env.example` (server-only keys without `NEXT_PUBLIC_`).
+- [ ] Smoke test the deployed URL **from a real phone**: report a photo, see the result card, submit the same issue again and see the merge. 👤 USER
 - [ ] Add the deployed URL to `README.md`.
 
 Exit gate
