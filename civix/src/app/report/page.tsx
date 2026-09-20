@@ -350,6 +350,19 @@ export default function ReportPage() {
         return;
       }
 
+      if (typeof window !== "undefined" && json.data?.ticket_no) {
+        try {
+          const myTickets = JSON.parse(localStorage.getItem("civix_my_tickets") || "[]");
+          if (!myTickets.includes(json.data.ticket_no)) {
+            myTickets.unshift(json.data.ticket_no);
+            localStorage.setItem("civix_my_tickets", JSON.stringify(myTickets.slice(0, 20)));
+            window.dispatchEvent(new Event("civix_my_tickets_change"));
+          }
+        } catch {
+          // ignore storage error
+        }
+      }
+
       setResult({
         ticket: json.data,
         merged: json.merged,

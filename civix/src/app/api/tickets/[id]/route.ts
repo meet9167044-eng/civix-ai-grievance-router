@@ -20,6 +20,52 @@ const PatchSchema = z.object({
     .optional(),
 });
 
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const supabase = createServerClient();
+    let ticket: Ticket | null = null;
+
+    if (supabase) {
+      try {
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+        const query = isUuid
+          ? supabase.from("tickets").select("*").eq("id", id)
+          : supabase.from("tickets").select("*").ilike("ticket_no", id);
+
+        const { data, error } = await query.single();
+        if (!error && data) {
+          ticket = data as Ticket;
+        }
+      } catch (err) {
+        console.warn("[tickets/id GET] Supabase query exception:", (err as Error).message);
+      }
+    }
+
+    if (!ticket) {
+      ticket = getFallbackTicketById(id) || getFallbackTicketByNo(id) || null;
+    }
+
+    if (!ticket) {
+      return NextResponse.json(
+        { ok: false, error: "not_found", message: "Ticket not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ ok: true, data: ticket });
+  } catch (err) {
+    console.error("[tickets/id GET] Unexpected error:", err);
+    return NextResponse.json(
+      { ok: false, error: "internal_error", message: "Failed to fetch ticket" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
