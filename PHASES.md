@@ -44,7 +44,7 @@ Submit a pothole photo, AI classifies it as Roads / Critical. Submit the same po
 | 2 | Citizen capture UI | 10:00-11:00 | DONE | |
 | 3 | AI classification | 11:00-12:00 | DONE | |
 | 4 | Database & ticket creation | 12:00-1:00 | DONE | d083ec6 |
-| 5 | Duplicate detection & priority | 1:00-2:00 | TODO | |
+| 5 | Duplicate detection & priority | 1:00-2:00 | DONE | |
 | 6 | First deploy (early smoke test) | 2:00-2:20 | TODO | |
 | 7 | Admin Kanban board | 2:20-3:20 | TODO | |
 | 8 | Map view & demo data | 3:20-4:00 | TODO | |
@@ -329,21 +329,21 @@ Commit: `feat: persist tickets`. **STOP.**
 **Goal:** the same issue reported twice merges into one ticket with a higher priority. This is the demo's winning moment.
 
 Tasks
-- [ ] `data/pois.ts`: 4-6 fictional schools/hospitals near the demo center. `isNearSensitiveSite(lat, lng)` returns true within 200 m.
-- [ ] `lib/ai/dedupe.ts`:
+- [x] `data/pois.ts`: 4-6 fictional schools/hospitals near the demo center. `isNearSensitiveSite(lat, lng)` returns true within 200 m.
+- [x] `lib/ai/dedupe.ts`:
   1. Query open tickets (`status != 'resolved'`) with the same category inside `bbox(lat, lng, 100)`, then keep those within 100 m by haversine, nearest first, max 5.
   2. None: return no duplicate.
   3. Otherwise make **one** AI call comparing the new `visual_signature` and description with each candidate's `title` and `visual_signature`. Prompt: *"Decide whether the new report describes the SAME physical issue as one of the existing tickets (same object, same spot), not merely a similar issue. Return ONLY JSON: {\"duplicate_of\": \"<id or null>\", \"confidence\": 0-1}. Be conservative."*
   4. Duplicate if `confidence >= 0.6`. If the AI call fails, treat as duplicate when a same-category ticket is within 30 m.
-- [ ] Update `POST /api/reports`: if duplicate, insert a `reports` row on the existing ticket, set `reports_count += 1`, keep the higher severity, recompute `priority_score` (including `near_sensitive_site`), set `updated_at`, and return `merged: true` with the updated ticket. Never overwrite the original formal text. If not a duplicate, create a new ticket and set `near_sensitive_site` from the POI helper.
-- [ ] `ResultCard` banner: "Merged with an existing report. Now reported by N people." vs "New ticket created."
+- [x] Update `POST /api/reports`: if duplicate, insert a `reports` row on the existing ticket, set `reports_count += 1`, keep the higher severity, recompute `priority_score` (including `near_sensitive_site`), set `updated_at`, and return `merged: true` with the updated ticket. Never overwrite the original formal text. If not a duplicate, create a new ticket and set `near_sensitive_site` from the POI helper.
+- [x] `ResultCard` banner: "Merged with an existing report. Now reported by N people." vs "New ticket created."
 
 Exit gate (show results)
-- [ ] Same pothole photo twice, about 20 m apart: second response has `merged: true`, `reports_count: 2`, and a higher `priority_score`.
-- [ ] Same category but 250 m apart: `merged: false`.
-- [ ] Same spot, different category: `merged: false`.
-- [ ] A ticket near a POI gets `near_sensitive_site: true` and +10 priority.
-- [ ] Typecheck and lint pass.
+- [x] Same pothole photo twice, about 20 m apart: second response has `merged: true`, `reports_count: 2`, and a higher `priority_score`.
+- [x] Same category but 250 m apart: `merged: false`.
+- [x] Same spot, different category: `merged: false`.
+- [x] A ticket near a POI gets `near_sensitive_site: true` and +10 priority.
+- [x] Typecheck and lint pass.
 
 Fallback: if AI comparison is flaky, ship with the geo-only rule (same category within 30 m) and log it as a shortcut.
 Commit: `feat: duplicate detection and priority score`. **STOP.**

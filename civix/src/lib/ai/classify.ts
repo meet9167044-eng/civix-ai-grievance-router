@@ -2,8 +2,13 @@
 
 import { analyzeImage, type AnalyzeImageParams } from "./client";
 import { ClassificationSchema, buildFallbackClassification, type Classification } from "./schema";
+import type { Category } from "@/lib/types";
 
-export async function classifyImage(params: AnalyzeImageParams): Promise<Classification> {
+export interface ClassifyImageOptions extends AnalyzeImageParams {
+  categoryHint?: Category;
+}
+
+export async function classifyImage(params: ClassifyImageOptions): Promise<Classification> {
   const start = Date.now();
 
   async function attempt(extra?: string): Promise<Classification | null> {
@@ -43,5 +48,5 @@ export async function classifyImage(params: AnalyzeImageParams): Promise<Classif
 
   // Fallback
   console.info(`[classify] Using fallback classification latency=${latency}ms`);
-  return buildFallbackClassification(params.description);
+  return buildFallbackClassification(params.description, params.categoryHint);
 }

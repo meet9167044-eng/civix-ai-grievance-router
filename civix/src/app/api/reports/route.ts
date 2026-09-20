@@ -5,15 +5,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { classifyImage } from "@/lib/ai/classify";
+import { findDuplicateTicket } from "@/lib/ai/dedupe";
 import { getDepartment } from "@/lib/departments";
 import { computePriority } from "@/lib/priority";
+import { isNearSensitiveSite } from "@/data/pois";
 import { createServerClient } from "@/lib/supabase/server";
 import {
   getFallbackTicketsCount,
   saveFallbackTicket,
   saveFallbackReport,
 } from "@/lib/supabase/fallbackStore";
-import type { ApiReportResponse, ApiErrorResponse, Ticket, Report } from "@/lib/types";
+import type { ApiReportResponse, ApiErrorResponse, Ticket, Report, Severity, Category } from "@/lib/types";
 
 // ── Simple in-memory rate limiter (per IP, 10 req / 60s) ─────────────────────
 const rateMap = new Map<string, { count: number; resetAt: number }>();
@@ -28,6 +30,18 @@ function checkRateLimit(ip: string): boolean {
   if (entry.count >= 10) return false;
   entry.count++;
   return true;
+}
+
+// ── Severity comparison helper ───────────────────────────────────────────────
+const SEVERITY_ORDER: Record<Severity, number> = {
+  low: 1,
+  medium: 2,
+  high: 3,
+  critical: 4,
+};
+
+function getHigherSeverity(s1: Severity, s2: Severity): Severity {
+  return (SEVERITY_ORDER[s1] ?? 1) >= (SEVERITY_ORDER[s2] ?? 1) ? s1 : s2;
 }
 
 // ── Body validation schema ────────────────────────────────────────────────────
@@ -104,7 +118,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<ApiReportResp
       { status: 400 }
     );
   }
-  const { description, lat, lng, address_text } = bodyResult.data;
+  const { description, lat, lng, address_text, category_hint } = bodyResult.data;
 
   // Convert image to base64 & buffer
   const arrayBuffer = await imageFile.arrayBuffer();
@@ -118,6 +132,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<ApiReportResp
     description,
     lat,
     lng,
+    categoryHint: category_hint && category_hint !== "auto" ? (category_hint as Category) : undefined,
   });
 
   // Not a civic issue
@@ -164,11 +179,106 @@ export async function POST(req: NextRequest): Promise<NextResponse<ApiReportResp
       imageUrl = `data:${imageFile.type};base64,${imageBase64}`;
     }
   } else {
-    // Local / fallback mode
     imageUrl = `data:${imageFile.type};base64,${imageBase64}`;
   }
 
-  // ── 2. Sequential ticket_no generation ─────────────────────────────────────
+  const nowIso = new Date().toISOString();
+
+  // ── 2. Phase 5: Duplicate Detection ─────────────────────────────────────────
+  const dedupeResult = await findDuplicateTicket({
+    category: classification.category,
+    lat,
+    lng,
+    visual_signature: classification.visual_signature,
+    description,
+  });
+
+  if (dedupeResult.isDuplicate && dedupeResult.duplicateTicket) {
+    const existing = dedupeResult.duplicateTicket;
+    const previousPriorityScore = existing.priority_score;
+    const newReportsCount = existing.reports_count + 1;
+    const mergedSeverity = getHigherSeverity(existing.severity, classification.severity);
+    const isNearSite = existing.near_sensitive_site || isNearSensitiveSite(lat, lng);
+    const newPriorityScore = computePriority(mergedSeverity, newReportsCount, isNearSite);
+
+    const reportRecord: Report = {
+      id: crypto.randomUUID(),
+      ticket_id: existing.id,
+      reporter_label: `Citizen #${newReportsCount}`,
+      description: description || null,
+      image_url: imageUrl,
+      lat,
+      lng,
+      created_at: nowIso,
+    };
+
+    if (supabase) {
+      try {
+        const { error: updateError } = await supabase
+          .from("tickets")
+          .update({
+            reports_count: newReportsCount,
+            severity: mergedSeverity,
+            priority_score: newPriorityScore,
+            near_sensitive_site: isNearSite,
+            updated_at: nowIso,
+          })
+          .eq("id", existing.id);
+
+        if (updateError) {
+          console.warn("[reports] Supabase update ticket error on merge:", updateError.message);
+        }
+
+        const { error: reportInsertError } = await supabase
+          .from("reports")
+          .insert([
+            {
+              id: reportRecord.id,
+              ticket_id: reportRecord.ticket_id,
+              reporter_label: reportRecord.reporter_label,
+              description: reportRecord.description,
+              image_url: reportRecord.image_url,
+              lat: reportRecord.lat,
+              lng: reportRecord.lng,
+              created_at: reportRecord.created_at,
+            },
+          ]);
+        if (reportInsertError) {
+          console.warn("[reports] Supabase report insert error on merge:", reportInsertError.message);
+        }
+      } catch (err) {
+        console.warn("[reports] Supabase merge exception:", (err as Error).message);
+      }
+    }
+
+    const updatedTicket: Ticket = {
+      ...existing,
+      reports_count: newReportsCount,
+      severity: mergedSeverity,
+      priority_score: newPriorityScore,
+      near_sensitive_site: isNearSite,
+      updated_at: nowIso,
+    };
+
+    saveFallbackTicket(updatedTicket);
+    saveFallbackReport(reportRecord);
+
+    console.info(
+      `[reports] Merged into ticket ${existing.ticket_no} (new count: ${newReportsCount}, priority: ${previousPriorityScore} -> ${newPriorityScore})`
+    );
+
+    return NextResponse.json({
+      ok: true,
+      merged: true,
+      previous_priority_score: previousPriorityScore,
+      data: updatedTicket,
+    });
+  }
+
+  // ── 3. New Ticket Creation (Not a duplicate) ────────────────────────────────
+  const isNearSite = isNearSensitiveSite(lat, lng);
+  const priority_score = computePriority(classification.severity, 1, isNearSite);
+
   let existingCount = 0;
   if (supabase) {
     try {
@@ -188,9 +298,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<ApiReportResp
   }
 
   const ticket_no = `CVX-${1000 + existingCount + 1}`;
-  const priority_score = computePriority(classification.severity, 1, false);
   const newTicketId = crypto.randomUUID();
-  const nowIso = new Date().toISOString();
 
   const ticketRecord: Ticket = {
     id: newTicketId,
@@ -209,7 +317,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<ApiReportResp
     visual_signature: classification.visual_signature,
     ai_confidence: classification.confidence,
     reports_count: 1,
-    near_sensitive_site: false,
+    near_sensitive_site: isNearSite,
     address_text: address_text ?? null,
     status_history: [{ status: "open", at: nowIso }],
     is_seed: false,
@@ -228,7 +336,6 @@ export async function POST(req: NextRequest): Promise<NextResponse<ApiReportResp
     created_at: nowIso,
   };
 
-  // ── 3. Database Persistence (Supabase + local fallback) ───────────────────
   if (supabase) {
     try {
       const { error: ticketError } = await supabase.from("tickets").insert([
@@ -282,7 +389,6 @@ export async function POST(req: NextRequest): Promise<NextResponse<ApiReportResp
     }
   }
 
-  // Always save to fallback store for resilient in-memory queries & testing
   saveFallbackTicket(ticketRecord);
   saveFallbackReport(reportRecord);
 
