@@ -44,7 +44,7 @@ Submit a pothole photo, AI classifies it as Roads / Critical. Submit the same po
 | 2 | Citizen capture UI | 10:00-11:00 | DONE | |
 | 3 | AI classification | 11:00-12:00 | DONE | |
 | 4 | Database & ticket creation | 12:00-1:00 | DONE | d083ec6 |
-| 5 | Duplicate detection & priority | 1:00-2:00 | DONE | |
+| 5 | Duplicate detection & priority | 1:00-2:00 | DONE | d1ee3ae |
 | 6 | First deploy (early smoke test) | 2:00-2:20 | TODO | |
 | 7 | Admin Kanban board | 2:20-3:20 | TODO | |
 | 8 | Map view & demo data | 3:20-4:00 | TODO | |
@@ -466,3 +466,4 @@ Commit: `docs: final submission`. **STOP. Build complete.**
 - Phase 2 | 11:00 AM | 3c3c1ad | Citizen capture flow complete (Photo compression, Voice input, Geolocation/Leaflet, ResultCard).
 - Phase 3 | 12:00 PM | 3c3c1ad | AI classification pipeline built with Gemini, Zod validation, and graceful fallback.
 - Phase 4 | 1:00 PM | d083ec6 | Ticket and report persistence, sequential CVX- ticket numbering, priority calculation, and sorted GET /api/tickets.
+- Phase 5 | 2:00 PM | d1ee3ae | Duplicate detection via 100m query & AI/geo matching, merge logic, priority boost, and POI proximity.
