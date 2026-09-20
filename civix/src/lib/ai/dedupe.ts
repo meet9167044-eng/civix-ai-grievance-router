@@ -83,7 +83,7 @@ export async function findDuplicateTicket(
   if (process.env.GEMINI_API_KEY && !process.env.GEMINI_API_KEY.includes("YOUR_GEMINI")) {
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const model = process.env.GEMINI_MODEL ?? "gemini-2.0-flash-exp";
+      const model = process.env.GEMINI_MODEL ?? "gemini-3.6-flash";
 
       const candidatesText = candidatesWithDistance
         .map(

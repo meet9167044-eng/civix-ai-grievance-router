@@ -14,7 +14,7 @@ export interface AnalyzeImageParams {
 
 async function analyzeWithGemini(params: AnalyzeImageParams): Promise<string> {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
-  const model = process.env.GEMINI_MODEL ?? "gemini-2.0-flash-exp";
+  const model = process.env.GEMINI_MODEL ?? "gemini-3.6-flash";
 
   const res = await ai.models.generateContent({
     model,
