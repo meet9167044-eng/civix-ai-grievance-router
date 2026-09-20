@@ -457,7 +457,7 @@ Commit: `docs: final submission`. **STOP. Build complete.**
 
 ## Shortcuts taken
 (Agent: list every fallback or shortcut, with phase number.)
-- Phase 4: Image storage falls back to compressed data URL until user configures Supabase bucket; ticket persistence falls back to in-memory store until Supabase tables are initialized.
+- None (Live Supabase database & public civix-images storage bucket active and verified).
 
 ## Progress Log
 (Agent: append one line per finished phase: `Phase N | time | commit hash | notes`.)
